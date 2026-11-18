@@ -46,7 +46,7 @@ npm ci --prefix integrations/band
 npm test --prefix integrations/band
 ```
 
-The main suite covers all single-road closures, 21 stock levels, disconnected roads, concurrent transactions, duplicates, worker failure, compound closures, bilingual intent and stale voice confirmations. The stress-test suite compares 292 compound scenarios to independent agent negotiations. The BAND suite exercises the installed SDK with its test transport. Live sponsor-room verification requires the owner's authenticated account.
+The main suite covers all single-road closures, 21 stock levels, disconnected roads, concurrent transactions, duplicates, worker failure, compound closures, bilingual intent and stale voice confirmations. The stress-test suite compares 292 compound scenarios to independent agent negotiations. The BAND suite exercises the installed SDK with its test transport. A live run with three independently authenticated BAND agents produced the same 12/20 outcome. [Read the BAND receipt](docs/band-live-run.md)
 
 For end-to-end checks, install Python Playwright and have Chromium on the path. Start the app, then run `python3 tests/browser_smoke.py` and `python3 tests/audio_smoke.py`. Set `RELAY_URL` to test another deployment. The audio test also requires FFmpeg with the Flite filter and network access to the versioned model. It decodes two distinct waveforms and verifies the map before and after confirmation.
 

@@ -1,0 +1,70 @@
+{
+  "source": "BAND room message history",
+  "scenarioId": "9d66753e-3a6e-44ee-8ef4-964b97b218a9",
+  "delivery": "BAND HTTPS Agent API / TypeScript SDK",
+  "input": {
+    "closed": [
+      30
+    ],
+    "reserve": 8
+  },
+  "elapsedSeconds": 8.463,
+  "messages": [
+    {
+      "id": "9d66753e-3a6e-44ee-8ef4-964b97b218a9",
+      "at": "2026-11-18T06:30:45.940673Z",
+      "from": "Operator",
+      "event": "scenario",
+      "message": "relay {\"closed\":[30],\"reserve\":8}"
+    },
+    {
+      "id": "8baa59b0-f253-41d0-923d-9612c47c1646",
+      "at": "2026-11-18T06:30:46.625496Z",
+      "from": "Shelter",
+      "event": "request",
+      "message": "Request 20 crates from west within 15 minutes."
+    },
+    {
+      "id": "333ccf7a-ec91-44a7-8fe8-985cabb8b479",
+      "at": "2026-11-18T06:30:48.648984Z",
+      "from": "West",
+      "event": "offer",
+      "message": "west offers 0 crates. ETA 21 min."
+    },
+    {
+      "id": "17d2aef9-66d1-4c3b-a54c-1fd1038cf380",
+      "at": "2026-11-18T06:30:49.184638Z",
+      "from": "Shelter",
+      "event": "request",
+      "message": "Request 20 crates from east within 15 minutes."
+    },
+    {
+      "id": "88df69d2-1902-4ec4-ba79-2d5baae47a1f",
+      "at": "2026-11-18T06:30:50.387983Z",
+      "from": "East",
+      "event": "offer",
+      "message": "east offers 12 crates. ETA 8 min."
+    },
+    {
+      "id": "8694bdd3-c5a1-4370-88b7-8d0e74a55b7a",
+      "at": "2026-11-18T06:30:51.731086Z",
+      "from": "Shelter",
+      "event": "accept",
+      "message": "Accept 12 crates from east."
+    },
+    {
+      "id": "80cba930-80dd-4c80-8330-7b477fa2b371",
+      "at": "2026-11-18T06:30:53.134946Z",
+      "from": "East",
+      "event": "committed",
+      "message": "east commits 12 crates."
+    },
+    {
+      "id": "e41ba868-ade8-496f-a197-b3eb8531bc63",
+      "at": "2026-11-18T06:30:54.403828Z",
+      "from": "Shelter",
+      "event": "result",
+      "message": "Simulation 9d66753e-3a6e-44ee-8ef4-964b97b218a9 complete. 12/20 crates committed (west 0, east 12). 8 outstanding."
+    }
+  ]
+}

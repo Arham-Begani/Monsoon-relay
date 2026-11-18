@@ -17,7 +17,7 @@ Close the featured section of Bhaskaran Road. West’s 12-minute drive becomes a
 
 | Platform | Project use and verification |
 |---|---|
-| BAND | Three Node processes implement the room negotiation using the official TypeScript SDK 2.2.0. The integration tests pass against BAND's SDK test transport. The browser demo uses independent local workers. A live BAND room test requires the owner’s authenticated account. |
+| BAND | Three independently authenticated agents completed a real BAND room negotiation using the TypeScript SDK and its HTTPS transport. The eight-message exchange took 8.46 seconds and confirmed 12 crates on time with eight outstanding. The browser demo runs its own local workers. [Verified BAND messages](docs/band-live-run.md) |
 | AdaL | The repository includes the source screen recording, tested CLI invocation and Video Producer editing prompt. The source capture was produced from the running application. An authenticated AdaL render is pending. |
 | Finch, Lyzr, Agent37 | No integration claimed. |
 
@@ -30,4 +30,4 @@ Close the featured section of Bhaskaran Road. West’s 12-minute drive becomes a
 
 ## Before sending the entry
 
-Complete the owner-authenticated AdaL render and replace the corresponding evidence line with its verified output. If demonstrating a hosted BAND room, run the same scenario there and record the actual result. The organizer requires a public repository and a demo. The main rules specify an AdaL video no longer than two minutes. Submission closes on 24 November 2026 at 10 PM IST. [Organizer brief](https://app.hidevs.xyz/hackathons/diwali-festiverse-a2a-india-2026) · [Evaluation and submission fields](https://app.hidevs.xyz/hackathons/diwali-festiverse-a2a-india-2026?tab=evaluation)
+Complete the owner-authenticated AdaL render and replace the corresponding evidence line with its verified output. The organizer requires a public repository and a demo. The main rules specify an AdaL video no longer than two minutes. Submission closes on 24 November 2026 at 10 PM IST. [Organizer brief](https://app.hidevs.xyz/hackathons/diwali-festiverse-a2a-india-2026) · [Evaluation and submission fields](https://app.hidevs.xyz/hackathons/diwali-festiverse-a2a-india-2026?tab=evaluation)
