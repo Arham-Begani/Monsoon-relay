@@ -1,0 +1,10 @@
+{
+  "name":"monsoon-relay",
+  "version":"1.0.0",
+  "private":true,
+  "scripts":{
+    "build":"node scripts/build.cjs",
+    "test":"node --test dispatch.test.cjs runtime.test.cjs voice.test.cjs",
+    "start":"npm run build && python3 -m http.server 8000 --directory dist"
+  }
+}
