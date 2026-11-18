@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Monsoon Relay · Halasuru operations</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header><div class="wordmark"><span class="mark" aria-hidden="true">≋</span> Monsoon Relay</div><span class="sim"><i></i> Flood simulation</span></header>
+<main>
+  <section class="workspace">
+    <div class="mapheading"><div><div class="location">BENGALURU <span>/</span> HALASURU</div><h1>Relief operations</h1></div><button id="reset" class="reset">↺ &nbsp;Reset</button></div>
+    <div class="mapwrap">
+      <canvas id="map" aria-label="Interactive Halasuru road map. Select a road here or use the road selector below."></canvas>
+      <div class="compass" aria-hidden="true">↑ N</div>
+      <div class="maplegend"><span><i class="key west"></i> West van</span><span><i class="key east"></i> East van</span><span><i class="key closed"></i> Closure</span></div>
+      <a class="credit" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap contributors</a>
+    </div>
+    <div class="field"><div class="sectionhead"><h2>Field report</h2><span id="closed-count"></span></div>
+      <label for="road">Pick a road on the supply route, or select any mapped road</label>
+      <div class="reportrow"><select id="road"></select><button id="toggle">Close road</button></div>
+      <div class="voicerow"><button id="mic"><span aria-hidden="true">◉</span> Voice report</button><select id="language" aria-label="Voice report language"><option value="en-IN">English</option><option value="hi-IN">हिन्दी</option></select><span id="voice-msg" role="status"></span></div>
+    </div>
+  </section>
+  <aside><div class="request"><div class="location">SHELTER REQUEST</div><h2>Drinking water</h2><p>Community hall <span>·</span> Within 15 min</p>
+    <div id="kpis" aria-live="polite"><div><b id="total">20</b><small>crates pledged on time</small></div><div><b id="gap">0</b><small>outstanding</small></div></div>
+    <div class="bars" id="bars" aria-hidden="true"></div>
+  </div>
+  <div class="sideblock"><h2>Depot commitments</h2><div id="depots"></div>
+  <div class="pledge"><label for="reserved">East stock pledged elsewhere</label><output id="held" for="reserved">8 crates</output><input id="reserved" type="range" min="0" max="20" value="8"></div></div>
+  <div class="sideblock exchange"><div class="sectionhead"><h2>Dispatch exchange</h2><span>LOCAL SIMULATION</span></div><ol id="messages"></ol></div>
+  </aside>
+</main>
+<footer>Halasuru, Bengaluru <span>Street geometry from OpenStreetMap. Stock, teams and travel times are simulated.</span></footer>
+<script src="streets.js"></script><script src="dispatch.js"></script><script src="map.js"></script><script src="app.js"></script>
+</body></html>
