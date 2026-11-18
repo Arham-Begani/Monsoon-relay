@@ -100,7 +100,7 @@
   }
 
   function installRadioIntake({
-    onTranscript, announce,
+    onTranscript, onStart, announce,
     sampleUrl = globalThis.MONSOON_RADIO_SAMPLE || './assets/radio/field-transmission.wav',
   }) {
     const sample = document.getElementById('radio-sample');
@@ -119,6 +119,7 @@
 
     async function review(read) {
       if (busy) return;
+      onStart?.();
       const current = ++attempt;
       setBusy(true);
       tell('Reading audio…');

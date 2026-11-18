@@ -160,6 +160,7 @@ function loadScenario(input) {
 }
 get('reset').addEventListener('click',()=>{
   if(location.hash)history.replaceState(null,'',location.href.split('#')[0]);
+  window.speechSynthesis?.cancel();
   get('report-text').value='';loadScenario(readScenario(''));
 });
 function readLocation() {
@@ -172,14 +173,14 @@ reports=installFieldReports({
   roads:streets.roads,getSelected:()=>selected,isClosed:id=>closed.has(id),
   selectRoad,applyReport:setClosure,announce:text=>{get('voice-msg').textContent=text;}
 });
-radio=installRadioIntake({onTranscript:text=>{
+radio=installRadioIntake({onStart:()=>reports.reset(),onTranscript:text=>{
   get('voice-options').open=true;
   get('report-text').value=text;
   get('parse-report').click();
 },announce:text=>{get('radio-status').textContent=text;}});
-get('radio-sample').addEventListener('click',()=>reports.reset());
 get('mic').addEventListener('click',()=>{radio.reset();get('voice-options').open=true;});
 get('report-text').addEventListener('input',()=>radio.reset());
+get('parse-report').addEventListener('click',()=>radio.reset());
 function showReceipt(){get('receipt-body').textContent=JSON.stringify(receipt,null,2);}
 get('evidence').addEventListener('click',()=>{if(receipt){showReceipt();get('receipt-dialog').showModal();}});
 get('receipt-close').addEventListener('click',()=>get('receipt-dialog').close());
