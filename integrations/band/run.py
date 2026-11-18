@@ -10,6 +10,7 @@ import signal
 import subprocess
 import sys
 import time
+import tempfile
 from urllib.error import HTTPError
 from urllib.parse import quote
 from urllib.request import build_opener, HTTPRedirectHandler, Request
@@ -38,7 +39,7 @@ def room_client(key, room):
     return request
 
 
-def verify(request, ids, check, timeout=120, interval=2):
+def verify(request, ids, check, timeout=120, interval=2, ready=None):
     def wait_for(read, description):
         end = time.monotonic() + timeout
         while True:
@@ -54,7 +55,7 @@ def verify(request, ids, check, timeout=120, interval=2):
         online = {p["id"] for p in request("/participants") if p.get("online") is True}
         return set(ids.values()).issubset(online)
 
-    wait_for(peers_online, "three online Band peers")
+    wait_for(ready or peers_online, "three authenticated room peers")
     sent = request("/messages", {"message": {
         "content": 'relay {"closed":[30],"reserve":8}', "mentions": [{"id": ids["shelter"]}]}})
     if not sent.get("success") or not sent.get("id"):
@@ -71,13 +72,17 @@ def verify(request, ids, check, timeout=120, interval=2):
     return expected
 
 
-def supervise(state, private, child_env, check_test, launch=subprocess.Popen):
+def supervise(state, private, child_env, check_test, launch=subprocess.Popen, transport="ws", ready_dir=None):
     children = []
     try:
         ids = {role: state["agents"][role]["id"] for role in ROLES}
         public = {"BAND_" + role.upper() + "_AGENT_ID": value for role, value in ids.items()}
         for role in ROLES:
             env = {**child_env, **public, "BAND_" + role.upper() + "_API_KEY": state["agents"][role]["key"]}
+            env["MONSOON_TRANSPORT"] = transport
+            if transport == "rest":
+                env["MONSOON_ROOM_ID"] = state["room"]
+                env["MONSOON_READY_FILE"] = str(ready_dir / role)
             children.append(launch(["node", str(ROOT / "peer.mjs"), role], cwd=private, env=env))
         def check():
             for role, child in zip(ROLES, children):
@@ -100,6 +105,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--test-room", action="store_true", help="send one live scenario and verify the reply")
     parser.add_argument("--exit-after-test", action="store_true", help="stop these peers after verification")
+    parser.add_argument("--transport", choices=("ws","rest"), default="ws", help="Band peer transport")
     args = parser.parse_args()
     if args.exit_after_test and not args.test_room:
         parser.error("--exit-after-test requires --test-room")
@@ -127,13 +133,16 @@ def main():
 
         def work(ids, check):
             if args.test_room:
-                print("Verified:", verify(room_client(key, state["room"]), ids, check), flush=True)
+                print("Verified:", verify(room_client(key, state["room"]), ids, check, ready=ready), flush=True)
             if not args.exit_after_test:
                 print("Peers running. Press Ctrl+C to stop.", flush=True)
                 while True:
                     check()
                     time.sleep(1)
-        supervise(state, private, env, work)
+        with tempfile.TemporaryDirectory(prefix="ready-", dir=private) as temp:
+            ready_dir = Path(temp)
+            ready = (lambda: all((ready_dir / role).is_file() for role in ROLES)) if args.transport == "rest" else None
+            supervise(state, private, env, work, transport=args.transport, ready_dir=ready_dir)
 
 
 if __name__ == "__main__":

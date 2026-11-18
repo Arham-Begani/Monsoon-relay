@@ -102,3 +102,55 @@ test('provisioning saves one-time credentials privately, resumes after quota rej
   assert.equal(rooms,1);
   assert.equal(statSync(join(dir,'peers.env')).mode & 0o777,0o600);
 });
+
+test('REST peers authenticate independently, exchange room deliveries and acknowledge the originating IDs', async () => {
+  const {roomApi, drainOne} = await import('./rest-peer.mjs');
+  const queue = Object.fromEntries(Object.values(ids).map(id => [id, []]));
+  const phases = new Map();
+  const final = [];
+  const origin = 'test-origin';
+  queue[ids.shelter].push({id:origin, sender_id:'resident', sender_type:'User', message_type:'text',
+    content:'@[[id-shelter]] relay {"closed":[30],"reserve":8}', chat_room_id:'room'});
+  let serial = 0;
+  const peers = {};
+  for (const [role,id] of Object.entries(ids)) {
+    const transport = async (url, options) => {
+      const path = new URL(url).pathname;
+      assert.equal(new Headers(options.headers).get('x-api-key'), 'fixture-' + id);
+      const respond = data => Response.json({data});
+      if (path.endsWith('/me')) return respond({id,name:role});
+      if (path.endsWith('/chats/room')) return respond({id:'room', inserted_at:'2026-01-01', updated_at:'2026-01-01'});
+      if (path.endsWith('/messages/next')) {
+        return queue[id].length ? respond(queue[id][0]) : new Response(null,{status:204});
+      }
+      if (path.endsWith('/processing') || path.endsWith('/processed')) {
+        const [messageId,status] = path.split('/').slice(-2);
+        assert.equal(messageId,queue[id][0].id);
+        if (status === 'processed') {
+          assert.equal(phases.get(messageId),'processing');
+          queue[id].shift();
+        }
+        phases.set(messageId,status);
+        return respond({success:true});
+      }
+      assert.ok(path.endsWith('/messages'));
+      const {message} = JSON.parse(options.body);
+      const recipient = message.mentions[0].id;
+      const frame = {id:'live-' + ++serial,sender_id:id,sender_type:'Agent',message_type:'text',
+        metadata:{mentions:message.mentions}, content:'@[[' + recipient + ']] ' + message.content};
+      if (recipient === 'resident') final.push(frame);
+      else queue[recipient].push(frame);
+      return respond({id:frame.id,success:true,recipients:[{id:recipient}]});
+    };
+    const api = roomApi({apiKey:'fixture-' + id,agentId:id},transport);
+    await api.authenticate('room');
+    peers[role] = {api, handle:handler(role,ids,new Map())};
+  }
+  for (let round=0; round<10 && !final.length; round++) {
+    for (const {api,handle} of Object.values(peers)) await drainOne(api,'room',handle);
+  }
+  assert.equal(final.length,1);
+  assert.equal(final[0].sender_id,ids.shelter);
+  assert.match(final[0].content,/Simulation test-origin complete. 12\/20 crates committed .*8 outstanding/);
+  assert.ok([...phases.values()].every(value => value === 'processed'));
+});

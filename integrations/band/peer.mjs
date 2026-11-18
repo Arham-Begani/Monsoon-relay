@@ -10,4 +10,16 @@ if (Object.values(ids).some(id => !id) || new Set(Object.values(ids)).size !== 3
 }
 const config = loadAgentConfigFromEnv({ prefix: 'BAND_' + role.toUpperCase() + '_' });
 const store = diskStore('.state/' + role);
-await Agent.create({ config, adapter: new GenericAdapter(handler(role, ids, store)) }).run();
+const handle = handler(role, ids, store);
+if (process.env.MONSOON_TRANSPORT === 'rest') {
+  const {runRest} = await import('./rest-peer.mjs');
+  try {
+    await runRest(config, process.env.MONSOON_ROOM_ID, handle, process.env.MONSOON_READY_FILE);
+  } catch (error) {
+    // Log status only. SDK exceptions can include credential-bearing request details.
+    console.error(role + ' REST peer stopped' + (error.statusCode ? ' (HTTP ' + error.statusCode + ')' : '') + '.');
+    process.exitCode = 1;
+  }
+} else {
+  await Agent.create({ config, adapter: new GenericAdapter(handle) }).run();
+}

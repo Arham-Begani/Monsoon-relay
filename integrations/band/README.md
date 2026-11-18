@@ -74,3 +74,13 @@ From the repository root on Linux or macOS with Python 3 and Node 22.12 or later
 The runner installs the locked SDK when needed, reads the temporary owner key from a hidden terminal prompt, BAND_USER_KEY, or the private owner.key file, provisions the peers and dedicated room, then starts all three peers. With --test-room it waits for all three agents to appear online, sends one road-30 scenario, and checks the room for a shelter reply matching the originating message ID and exact 12/20 outcome. A plan restriction on Human API sends can return HTTP 403. In that case run the same command without --test-room and submit the example using the shelter mention picker in the room. [Send messages](https://docs.band.ai/api/human-api/human-api-messages/send-my-chat-message) · [Read messages](https://docs.band.ai/api/human-api/human-api-messages/list-my-chat-messages)
 
 Keep the runner open to serve the room. Ctrl+C stops its local peers. Add --exit-after-test for a single verification run that stops those processes on completion. Room and agent registrations stay in your Band account. Run the orchestration fixtures from integrations/band with `python3 -m unittest test_runner`.
+
+### Dedicated-room REST transport
+
+Band recommends WebSocket delivery for ongoing work. Where an outbound proxy blocks WebSocket connections, the runner can use the Agent API backlog endpoint in the dedicated test room:
+
+```sh
+./integrations/band/run.py --transport rest --test-room
+```
+
+REST mode starts an independent process and authenticated client per peer. Each process verifies its identity and access to the room before signaling readiness. It reads its next actionable delivery, marks the delivery as processing, sends any reply with the recipient’s Band ID in the mentions array, and acknowledges the original delivery. Requests are sequential per agent with a 15-second request timeout, an idle wait of 1.8 seconds, and bounded backoff on failure. The room's online badges reflect WebSocket presence. The runner verifies the actual shelter reply using the Human API. Avoid starting a second transport for the same peer and room simultaneously. [Agent delivery semantics](https://docs.band.ai/api/agent-api) · [Next actionable message](https://docs.band.ai/api/agent-api/agent-api-messages/get-agent-next-message)
