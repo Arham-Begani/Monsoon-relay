@@ -2,35 +2,45 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Monsoon Relay · Halasuru operations</title>
+<meta name="theme-color" content="#132e34"><title>Monsoon Relay · Halasuru operations</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header><div class="wordmark"><span class="mark" aria-hidden="true">≋</span> Monsoon Relay</div><span class="sim"><i></i> Flood simulation</span></header>
+<header>
+  <div class="wordmark"><svg class="mark" viewBox="0 0 40 40" aria-hidden="true"><path fill="currentColor" d="M3 31 12 9h5L8 31zm10 0 9-22h5l-9 22zm10 0 9-22h5l-9 22z"/></svg>Monsoon Relay</div>
+  <div class="header-actions"><span class="sim"><i></i> Flood simulation</span><button id="share">Share scenario</button></div>
+</header>
 <main>
-  <section class="workspace">
-    <div class="mapheading"><div><div class="location">BENGALURU <span>/</span> HALASURU</div><h1>Relief operations</h1></div><button id="reset" class="reset">↺ &nbsp;Reset</button></div>
+  <div class="mapheading"><div><div class="location">BENGALURU <span>/</span> HALASURU</div><h1>Relief operations</h1></div><button id="reset" class="reset"><span aria-hidden="true">↺</span> Reset scenario</button></div>
+  <section class="workspace" aria-label="Operations map and field reports">
     <div class="mapwrap">
-      <canvas id="map" aria-label="Interactive Halasuru road map. Select a road here or use the road selector below."></canvas>
-      <div class="compass" aria-hidden="true">↑ N</div>
-      <div class="maplegend"><span><i class="key west"></i> West van</span><span><i class="key east"></i> East van</span><span><i class="key closed"></i> Closure</span></div>
+      <canvas id="map" aria-label="Halasuru street map with west and east depots, community hall, routes and closures. Use the road selector below for keyboard access."></canvas>
+      <div class="maptitle">Dispatch map</div><div class="compass" aria-hidden="true">↑ N</div>
+      <div class="maplegend"><span><i class="key west"></i>West van</span><span><i class="key east"></i>East van</span><span><i class="key closed"></i>Closure</span></div>
       <a class="credit" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap contributors</a>
     </div>
-    <div class="field"><div class="sectionhead"><h2>Field report</h2><span id="closed-count"></span></div>
-      <label for="road">Pick a road on the supply route, or select any mapped road</label>
+    <div class="field"><div class="sectionhead"><h2>Field report</h2><div class="field-actions"><span id="closed-count"></span><button id="mic" type="button">◉ &nbsp;Voice report</button></div></div>
+      <label for="road">Select a road section or pick one on the map</label>
       <div class="reportrow"><select id="road"></select><button id="toggle">Close road</button></div>
-      <div class="voicerow"><button id="mic"><span aria-hidden="true">◉</span> Voice report</button><select id="language" aria-label="Voice report language"><option value="en-IN">English</option><option value="hi-IN">हिन्दी</option></select><span id="voice-msg" role="status"></span></div>
+      <details id="voice-options"><summary>Report text and language</summary>
+        <label for="report-text">Report a road closure or reopening</label>
+        <div class="reportrow"><input id="report-text" type="text" placeholder="Close Bhaskaran Road section two" autocomplete="off"><button id="parse-report" type="button">Review</button></div>
+        <div class="voicerow"><label for="language">Language</label><select id="language" aria-label="Report language"><option value="en-IN">English</option><option value="hi-IN">हिन्दी</option></select><label class="readback"><input type="checkbox" id="speak-result"> Speak dispatch result</label></div>
+      </details><p id="voice-msg" role="status"></p>
     </div>
   </section>
-  <aside><div class="request"><div class="location">SHELTER REQUEST</div><h2>Drinking water</h2><p>Community hall <span>·</span> Within 15 min</p>
-    <div id="kpis" aria-live="polite"><div><b id="total">20</b><small>crates pledged on time</small></div><div><b id="gap">0</b><small>outstanding</small></div></div>
+  <aside aria-label="Dispatch summary"><div class="request"><div class="location">Shelter request</div><h2>Drinking water</h2><p>Community hall <span>·</span> 20 crates within 15 min</p>
+    <div id="kpis" aria-live="polite"><div><b id="total">…</b><small>pledged on time</small></div><div><b id="gap">…</b><small>outstanding</small></div></div>
     <div class="bars" id="bars" aria-hidden="true"></div>
+    <p class="comparison"><b id="gain">0</b> additional crates with mutual aid</p>
   </div>
   <div class="sideblock"><h2>Depot commitments</h2><div id="depots"></div>
-  <div class="pledge"><label for="reserved">East stock pledged elsewhere</label><output id="held" for="reserved">8 crates</output><input id="reserved" type="range" min="0" max="20" value="8"></div></div>
-  <div class="sideblock exchange"><div class="sectionhead"><h2>Dispatch exchange</h2><span>LOCAL SIMULATION</span></div><ol id="messages"></ol></div>
+  <div class="pledge"><label for="reserved">Reserved for school shelter pickup</label><output id="held" for="reserved">8 crates</output><input id="reserved" type="range" min="0" max="20" value="8"></div></div>
+  <div class="sideblock exchange"><div class="sectionhead"><h2>Dispatch exchange</h2><button id="evidence" class="textbutton">Run receipt</button></div><ol id="messages"></ol></div>
   </aside>
 </main>
-<footer>Halasuru, Bengaluru <span>Street geometry from OpenStreetMap. Stock, teams and travel times are simulated.</span></footer>
-<script src="streets.js"></script><script src="dispatch.js"></script><script src="map.js"></script><script src="app.js"></script>
+<footer><span>Halasuru, Bengaluru · Simulated teams, stock and travel times.</span></footer>
+<p id="session-status" role="status"></p>
+<dialog id="receipt-dialog" aria-labelledby="receipt-title"><div class="sectionhead"><h2 id="receipt-title">Run receipt</h2><button id="receipt-close" type="button" aria-label="Close run receipt">×</button></div><pre id="receipt-body"></pre><div class="receipt-actions"><button id="copy-receipt">Copy receipt</button><button id="band-command">Copy BAND command</button></div></dialog>
+<script src="streets.js"></script><script src="dispatch.js"></script><script src="map.js"></script><script src="voice.js"></script><script src="protocol.js"></script><script src="runtime.js"></script><script src="app.js"></script>
 </body></html>

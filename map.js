@@ -4,6 +4,7 @@ function createMap(canvas, onSelect) {
   const layer = base.getContext('2d');
   let scale=1, left=0, top=0, width=0, height=0, pixelRatio=1, state, frame;
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  let previousRoute = null, changedAt = 0;
   const roads = streets.roads.map(r => r.runs.map(run => run.map(n => streets.nodes[n])));
   const screen = ([x,y]) => [x*scale+left, y*scale+top];
   function line(c, points) {
@@ -14,6 +15,9 @@ function createMap(canvas, onSelect) {
     base.width = canvas.width; base.height=canvas.height;
     layer.setTransform(pixelRatio,0,0,pixelRatio,0,0);
     layer.fillStyle='#14262c'; layer.fillRect(0,0,width,height);
+    layer.strokeStyle='#20373c'; layer.lineWidth=.6;
+    for(let x=0;x<width;x+=32){line(layer,[[x,0],[x,height]]);layer.stroke();}
+    for(let y=0;y<height;y+=32){line(layer,[[0,y],[width,y]]);layer.stroke();}
     layer.translate(left,top); layer.scale(scale,scale);
     const fill = {building:'#21383f',park:'#284b40',water:'#165365',stream:'#285c69'};
     for (const [type, pts] of streets.land) {
@@ -37,7 +41,7 @@ function createMap(canvas, onSelect) {
       if (labels.some(l=>l.name===r.name)) continue;
       const pts=roads[i][0], pt=pts[Math.floor(pts.length/2)], [x,y]=screen(pt);
       if(x<42||x>width-46||y<21||y>height-22 || labels.some(l=>Math.abs(l.x-x)<108 && Math.abs(l.y-y)<36)) continue;
-      labels.push({name:r.name,x,y});layer.font='9px monospace';layer.fillStyle='#94aaac';
+      labels.push({name:r.name,x,y});layer.font='9px sans-serif';layer.fillStyle='#9aaeb0';
       layer.textAlign='center';layer.fillText(r.name,x,y);
     }
   }
@@ -49,7 +53,9 @@ function createMap(canvas, onSelect) {
   function pathLine(route,color,active,t) {
     const pts=route.path.map(n=>screen(streets.nodes[n]));
     if(pts.length<2) return;
-    line(ctx,pts);ctx.strokeStyle=active?color:'#91a0ad85';ctx.lineWidth=active?4:2;
+    line(ctx,pts);
+    if(active){ctx.strokeStyle='#101f26';ctx.lineWidth=7;ctx.stroke();}
+    ctx.strokeStyle=active?color:'#a4b1b38c';ctx.lineWidth=active?3.8:1.6;
     ctx.setLineDash(active?[]:[4,6]);ctx.shadowBlur=active?8:0;ctx.shadowColor=color;ctx.stroke();
     ctx.shadowBlur=0;ctx.setLineDash([]);
     if(!active) return;
@@ -77,7 +83,15 @@ function createMap(canvas, onSelect) {
     const {plan,closed,selected}=state;
     if(!closed.has(selected)) roadStroke(selected,'#ffb785a6',5,[3,5]);
     pathLine(plan.west,'#8cf1ce',plan.westQty>0,t);
-    if(!plan.westQty) pathLine(plan.east,'#81c4ff',plan.eastQty>0,t);
+    if(plan.eastQty>0 || !plan.westQty) pathLine(plan.east,'#81c4ff',plan.eastQty>0,t);
+    if(previousRoute && !reducedMotion.matches){
+      const age=t-changedAt;
+      if(age>=0 && age<1800){
+        ctx.globalAlpha=(1-age/1800)*.52;
+        pathLine(previousRoute,'#cbd1c6',false,t);
+        ctx.globalAlpha=1;
+      }
+    }
     for(const id of closed) {
       roadStroke(id,'#ff8057',4,[5,4]);
       const pts=roads[id][0], [x,y]=screen(pts[Math.floor(pts.length/2)]);
@@ -94,7 +108,8 @@ function createMap(canvas, onSelect) {
   new ResizeObserver(() => {
     const rect=canvas.getBoundingClientRect();width=rect.width;height=rect.height;
     pixelRatio=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(width*pixelRatio);canvas.height=Math.round(height*pixelRatio);
-    scale=width/1200;left=0;top=(height-821*scale)/2;
+    scale=Math.min(width/1000,(height-78)/400);
+    left=(width-1170*scale)/2;top=(height-850*scale)/2;
     drawBase();restart();
   }).observe(canvas);
   reducedMotion.addEventListener('change',restart);
@@ -111,5 +126,13 @@ function createMap(canvas, onSelect) {
     });
     if(id>=0) onSelect(id);
   });
-  return nextState => {state=nextState;restart();};
+  return nextState => {
+    if(state && state.plan!==nextState.plan){
+      const prior=state.plan.westQty?state.plan.west:state.plan.east;
+      const next=nextState.plan.westQty?nextState.plan.west:nextState.plan.east;
+      if(prior.path.join(',')!==next.path.join(',')){previousRoute=prior;changedAt=performance.now();}
+    }
+    canvas.parentElement.classList.toggle('east-dispatch',nextState.plan.eastQty>0);
+    state=nextState;restart();
+  };
 }
