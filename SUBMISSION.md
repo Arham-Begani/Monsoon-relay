@@ -3,7 +3,7 @@
 **Track** — Voice · Listen & Act  
 **Live demo** — https://monsoon-relay.vercel.app/  
 **Public repository** — https://github.com/Arham-Begani/Monsoon-relay  
-**Screen-recorded walkthrough** — https://monsoon-relay.vercel.app/watch.html
+**AdaL-rendered walkthrough (90.65 seconds)** — https://monsoon-relay.vercel.app/watch.html
 
 ## Project description
 
@@ -18,7 +18,7 @@ Close the featured section of Bhaskaran Road. West’s 12-minute drive becomes a
 | Platform | Project use and verification |
 |---|---|
 | BAND | Three independently authenticated agents completed a real BAND room negotiation using the TypeScript SDK and its HTTPS transport. The eight-message exchange took 8.46 seconds and confirmed 12 crates on time with eight outstanding. The browser demo runs its own local workers. [Verified BAND messages](docs/band-live-run.md) |
-| AdaL | The repository includes the source screen recording, tested CLI invocation and Video Producer editing prompt. The source capture was produced from the running application. An authenticated AdaL render is pending. |
+| AdaL | The authenticated AdaL CLI used its Bash tool and a local Ollama model to run the FFmpeg edit. The 90.65-second 1080p export combines footage from the working app with the verified BAND result and narration. [Render receipt and video](docs/adal/README.md) |
 | Finch, Lyzr, Agent37 | No integration claimed. |
 
 ## Engineering challenges
@@ -28,6 +28,6 @@ Close the featured section of Bhaskaran Road. West’s 12-minute drive becomes a
 - A visually plausible detour can still arrive too late. Every offer is checked against the same directed road graph and deadline. Judges can compare coordinated dispatch with West operating alone and audit the individual messages.
 - Microphone services vary by browser. An English sample and short audio uploads use an on-device acoustic model. Typed Hindi, Hinglish and English reports also pass through the same confirmation step.
 
-## Before sending the entry
+## Submission details
 
-Complete the owner-authenticated AdaL render and replace the corresponding evidence line with its verified output. The organizer requires a public repository and a demo. The main rules specify an AdaL video no longer than two minutes. Submission closes on 24 November 2026 at 10 PM IST. [Organizer brief](https://app.hidevs.xyz/hackathons/diwali-festiverse-a2a-india-2026) · [Evaluation and submission fields](https://app.hidevs.xyz/hackathons/diwali-festiverse-a2a-india-2026?tab=evaluation)
+The repository and demo are public. The linked AdaL export runs under the organizer’s two-minute limit. Submission closes on 24 November 2026 at 10 PM IST. [Organizer brief](https://app.hidevs.xyz/hackathons/diwali-festiverse-a2a-india-2026) · [Evaluation and submission fields](https://app.hidevs.xyz/hackathons/diwali-festiverse-a2a-india-2026?tab=evaluation)

@@ -1,0 +1,14 @@
+{
+  "producer": "AdaL CLI 1.11.13",
+  "model": "ollama-qwen2.5:3b",
+  "tool": "bash",
+  "toolCallId": "64cb176f-804f-4797-86e7-88dc27d52312",
+  "toolStatus": "completed",
+  "exitCode": 0,
+  "recipe": "edit/render.py",
+  "edit": "source walkthrough plus verified BAND result and narration",
+  "durationSeconds": 90.653333,
+  "file": "monsoon-relay-demo.mp4",
+  "sizeBytes": 7857798,
+  "sha256": "35e4d43f99e3eb9c22eedfd5bf313665b06c3f43a4c35e39ab8f062aba8d2e18"
+}

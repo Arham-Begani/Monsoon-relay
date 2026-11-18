@@ -54,4 +54,4 @@ For end-to-end checks, install Python Playwright and have Chromium on the path. 
 
 Map geometry and buildings © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), licensed under [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/). The extract spans 77.617–77.629° E and 12.974–12.982° N. Numbered sections identify features in this extract. Stock, actors, deadlines and travel times are simulation inputs. The results represent pledges within the simulated deadline. [Audio model and sample provenance](assets/radio/README.md)
 
-Submission materials and the sponsor video workflow are in [SUBMISSION.md](SUBMISSION.md) and [docs/adal](docs/adal/README.md).
+Submission materials and evidence from the authenticated AdaL render are in [SUBMISSION.md](SUBMISSION.md) and [docs/adal](docs/adal/README.md).

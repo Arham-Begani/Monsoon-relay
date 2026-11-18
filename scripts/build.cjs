@@ -11,5 +11,5 @@ for (const file of files) {
   fs.copyFileSync(path.join(root,file),path.join(out,file));
 }
 fs.copyFileSync(path.join(root,'docs','dispatch-preview.png'),path.join(out,'preview.png'));
-fs.copyFileSync(path.join(root,'docs','adal','monsoon-relay-capture.mp4'),path.join(out,'walkthrough.mp4'));
+fs.copyFileSync(path.join(root,'docs','adal','monsoon-relay-demo.mp4'),path.join(out,'walkthrough.mp4'));
 console.log('Static simulator built in dist/');

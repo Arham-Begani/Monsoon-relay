@@ -1,21 +1,23 @@
-# Render the demo with AdaL
+# Final competition video
 
-## Source capture
+**[Watch the 90.65-second walkthrough](https://monsoon-relay.vercel.app/watch.html) · [Final MP4](monsoon-relay-demo.mp4) · [AdaL render receipt](render-receipt.json)**
 
-[Monsoon Relay source video](monsoon-relay-capture.mp4) is an 83.5-second, 1080p screen recording of the working dashboard in Chromium. The browser transcribed the original synthetic radio sample with Vosk. The edit mixes that same file at the recorded playback cue and includes locally rendered Piper narration and open captions. AdaL sign-in is still needed to produce the sponsor export.
+The authenticated AdaL CLI 1.11.13 invoked its Bash tool to run the local FFmpeg edit. Ollama supplied the local model. The edit preserves the original screen recording, spoken narration, demo-radio audio and open captions, then appends a narrated card from the [verified BAND room exchange](../band-live-run.md). The production player serves this export.
 
-## Import and export
+| Export detail | Verified value |
+|---|---|
+| Duration | 90.653 seconds |
+| Picture | 1920 × 1080, H.264, 30 fps |
+| Audio | AAC, 48 kHz |
+| File size | 7,857,798 bytes |
+| SHA-256 | `35e4d43f99e3eb9c22eedfd5bf313665b06c3f43a4c35e39ab8f062aba8d2e18` |
 
-1. Keep [the source capture](monsoon-relay-capture.mp4) at `docs/adal/monsoon-relay-capture.mp4` relative to the repository root. See [demo-prompt.md](demo-prompt.md) for the edit brief.
-2. Open the repository in the AdaL Desktop app or [install the official CLI](https://github.com/SylphAI-Inc/adal-cli#install-adal-cli). From the repository root, run `adal` and complete the first-time browser sign-in if prompted. Paste the contents of [demo-prompt.md](demo-prompt.md) into the AdaL chat and review tool prompts. Video Producer is built in. [AdaL Video Producer](https://docs.sylph.ai/features/video-producer)
-3. Open the resulting video and review the footage, claims, and captions. Export its current version as MP4 from the Desktop player or use the final MP4 path reported by the CLI. AdaL defaults to storing video projects under `~/AdaL/Videos/`. [AdaL video export](https://docs.sylph.ai/features/video-producer#export-a-file-to-share)
+## Reproduce the edit
 
-## Authenticated CLI option
-
-After first-time sign-in, run this from the repository root. If headless stops at a tool approval, continue interactively and review that action in AdaL. [Headless authentication and permissions](https://docs.sylph.ai/integration/headless)
+The [83.5-second source capture](monsoon-relay-capture.mp4) shows the actual application in Chromium, including on-device Vosk recognition. The closing card and its English narration are in [edit](edit). From the repository root, ask the authenticated AdaL CLI to execute the following local render command with its Bash tool. Python 3 and FFmpeg with libx264 and AAC encoding are required. The recipe resolves its inputs relative to its file location.
 
 ```sh
-adal --agent-mode video --prompt-file docs/adal/demo-prompt.md --permission-mode acceptEdits -o json
+python3 docs/adal/edit/render.py
 ```
 
-Check the reported MP4 with `ffprobe -v error -show_entries format=duration -of csv=p=0 /path/to/monsoon-relay-demo.mp4`. Confirm the video is under 120 seconds and the closure, transfer, and remaining gap are readable. Retain the AdaL video project or the CLI response if you need evidence that AdaL performed the edit.
+The AdaL execution receipt records the tool call, tool status, local model, exit code and digest of the published file. The repository also retains the [original creative brief](demo-prompt.md). [AdaL CLI](https://github.com/SylphAI-Inc/adal-cli) · [AdaL headless usage](https://docs.sylph.ai/integration/headless)
