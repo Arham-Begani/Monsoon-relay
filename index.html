@@ -11,7 +11,7 @@
   <div class="header-actions"><span class="sim"><i></i> Flood simulation</span><button id="share">Share scenario</button></div>
 </header>
 <main>
-  <div class="mapheading"><div><div class="location">BENGALURU <span>/</span> HALASURU</div><h1>Relief operations</h1></div><button id="reset" class="reset"><span aria-hidden="true">↺</span> Reset scenario</button></div>
+  <div class="mapheading"><div><div class="location">BENGALURU <span>/</span> HALASURU</div><h1>Relief operations</h1></div><div class="scenario-actions"><button id="impact-open">Test road closures</button><button id="reset" class="reset"><span aria-hidden="true">↺</span> Reset scenario</button></div></div>
   <section class="workspace" aria-label="Operations map and field reports">
     <div class="mapwrap">
       <canvas id="map" aria-label="Halasuru street map with west and east depots, community hall, routes and closures. Use the road selector below for keyboard access."></canvas>
@@ -42,5 +42,10 @@
 <footer><span>Halasuru, Bengaluru · Simulated teams, stock and travel times.</span></footer>
 <p id="session-status" role="status"></p>
 <dialog id="receipt-dialog" aria-labelledby="receipt-title"><div class="sectionhead"><h2 id="receipt-title">Run receipt</h2><button id="receipt-close" type="button" aria-label="Close run receipt">×</button></div><pre id="receipt-body"></pre><div class="receipt-actions"><button id="copy-receipt">Copy receipt</button><button id="band-command">Copy BAND command</button></div></dialog>
-<script src="streets.js"></script><script src="dispatch.js"></script><script src="map.js"></script><script src="radio.js"></script><script src="voice.js"></script><script src="protocol.js"></script><script src="runtime.js"></script><script src="app.js"></script>
+<dialog id="impact-dialog" aria-labelledby="impact-title">
+  <div class="sectionhead"><h2 id="impact-title">Road closure stress test</h2><button id="impact-close" aria-label="Close stress test">×</button></div>
+  <p class="dialog-intro">Close each open section in a separate simulation and compare the new delivery plan with the current one.</p>
+  <p id="impact-summary" role="status"></p><div id="impact-results"></div>
+</dialog>
+<script src="streets.js"></script><script src="dispatch.js"></script><script src="map.js"></script><script src="radio.js"></script><script src="voice.js"></script><script src="protocol.js"></script><script src="runtime.js"></script><script src="impact.js"></script><script src="app.js"></script>
 </body></html>

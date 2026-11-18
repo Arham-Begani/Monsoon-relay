@@ -199,3 +199,39 @@ get('copy-receipt').addEventListener('click',()=>{if(receipt)copyText(JSON.strin
 get('band-command').addEventListener('click',()=>copyText('relay '+JSON.stringify({closed:[...closed].sort((a,b)=>a-b),reserve:Number(reserved.value)}),'BAND command'));
 get('share').addEventListener('click',()=>copyText(scenarioUrl(),'Scenario link'));
 readLocation();
+let impactAnalyzer, impactVersion=0;
+const impactDialog=get('impact-dialog');
+get('impact-close').addEventListener('click',()=>impactDialog.close());
+impactDialog.addEventListener('close',()=>{impactVersion++;impactAnalyzer?.close();impactAnalyzer=null;});
+get('impact-open').addEventListener('click',async ()=>{
+  const myVersion=++impactVersion;
+  get('impact-results').replaceChildren();
+  get('impact-summary').textContent='Calculating routes and commitments…';
+  impactDialog.showModal();
+  impactAnalyzer=createImpactAnalyzer();
+  try{
+    const result=await impactAnalyzer.run(new Set(closed),Number(reserved.value));
+    if(myVersion!==impactVersion)return;
+    get('impact-summary').textContent=result.tested+' road sections tested · '+result.handoffs+' depot handoffs · '+result.losses+' reduced on-time supply';
+    if(!result.tested)return;
+    const label=document.createElement('label');
+    label.textContent='Explore a section, ranked by supply loss and route delay';
+    label.htmlFor='impact-road';
+    const select=document.createElement('select');select.id='impact-road';
+    for(const row of result.rows)select.add(new Option(streets.roads[row.id].label,row.id));
+    const detail=document.createElement('p');detail.className='impact-detail';
+    const apply=document.createElement('button');apply.textContent='Apply this closure';apply.type='button';
+    function show(){
+      const row=result.rows[select.selectedIndex];
+      const minutes=x=>Number.isFinite(x)?x+' min':'unreachable';
+      detail.textContent='West ETA '+minutes(row.westMinutes)+' · East ETA '+minutes(row.eastMinutes)+'. '+
+        row.total+' of 20 crates pledged on time ('+row.westQty+' west, '+row.eastQty+' east). '+row.gap+' outstanding.';
+    }
+    select.addEventListener('change',show);show();
+    apply.addEventListener('click',()=>{
+      const id=Number(select.value);impactDialog.close();manualSelect(id);setClosure(id,true);
+      get('voice-msg').textContent=streets.roads[id].label+' closed after stress test.';
+    });
+    get('impact-results').append(label,select,detail,apply);
+  }catch{if(myVersion===impactVersion)get('impact-summary').textContent='Analysis interrupted. Reopen the stress test to run it again.';}
+});
