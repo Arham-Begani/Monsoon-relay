@@ -15,6 +15,6 @@ On 18 November 2026, three separately authenticated Node processes negotiated a 
 | 06:30:53.134 | East | east commits 12 crates. |
 | 06:30:54.403 | Shelter | Simulation 9d66753e-3a6e-44ee-8ef4-964b97b218a9 complete. 12/20 crates committed (west 0, east 12). 8 outstanding. |
 
-The public extract retains the message IDs, timestamps and decision text returned by BAND. Participant mention identifiers are omitted. The user-initiated message and final shelter reply share the same scenario ID. These are communications about a simulation, not observations of an actual delivery.
+The public extract retains the message IDs, timestamps and decision text returned by BAND. Participant mention identifiers are omitted. The user-initiated message and final shelter reply share the same scenario ID. The messages refer to the simulated delivery shown in the project.
 
 [Machine-readable evidence](band-live-run.json) · [Run the same scenario](https://monsoon-relay.vercel.app/#v=1&roads=30&reserve=8&pick=30) · [Reproduce the BAND integration](../integrations/band/README.md)

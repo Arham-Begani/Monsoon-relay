@@ -120,16 +120,24 @@ def main():
         env = {k:v for k,v in os.environ.items() if not k.startswith(("BAND_", "THENVOI_"))}
         if not (ROOT / "node_modules/@band-ai/sdk/package.json").exists():
             subprocess.run(["npm","ci","--ignore-scripts","--no-audit"], cwd=ROOT, env=env, check=True)
-        key = os.environ.get("BAND_USER_KEY")
-        if not key and (private / "owner.key").exists():
-            key = (private / "owner.key").read_text().strip()
-        if not key:
-            if not sys.stdin.isatty():
-                raise RuntimeError("Supply BAND_USER_KEY through the runtime secret manager or run from a terminal.")
-            key = getpass.getpass("Band user API key (hidden): ").strip()
-        provision_env = {**env, "BAND_USER_KEY":key, "MONSOON_BAND_DIR":str(private)}
-        subprocess.run(["node",str(ROOT / "provision.mjs")], env=provision_env, check=True)
-        state = json.loads((private / "provision.json").read_text())
+        journal = private / "provision.json"
+        state = json.loads(journal.read_text()) if journal.exists() else {}
+        initialized = state.get("room") and all(
+            state.get("agents", {}).get(role, {}).get("key") for role in ROLES
+        )
+        key = None
+        if not initialized or args.test_room:
+            key = os.environ.get("BAND_USER_KEY")
+            if not key and (private / "owner.key").exists():
+                key = (private / "owner.key").read_text().strip()
+            if not key:
+                if not sys.stdin.isatty():
+                    raise RuntimeError("Supply BAND_USER_KEY through the runtime secret manager or run from a terminal.")
+                key = getpass.getpass("Band user API key (hidden): ").strip()
+        if not initialized:
+            provision_env = {**env, "BAND_USER_KEY":key, "MONSOON_BAND_DIR":str(private)}
+            subprocess.run(["node",str(ROOT / "provision.mjs")], env=provision_env, check=True)
+            state = json.loads(journal.read_text())
 
         def work(ids, check):
             if args.test_room:
