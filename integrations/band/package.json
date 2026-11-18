@@ -1,0 +1,9 @@
+{
+  "name": "monsoon-relay-band",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.12" },
+  "scripts": { "start": "node --env-file-if-exists=.env peer.mjs", "test": "node --test test.mjs" },
+  "dependencies": { "@band-ai/sdk": "2.2.0" }
+}
