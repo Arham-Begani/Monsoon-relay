@@ -76,3 +76,29 @@ test('invalid reserve or unknown road returns usage to the human', async t => {
     assert.match(response.message.content, /Supply map road IDs/);
   }
 });
+
+test('provisioning saves one-time credentials privately, resumes after quota rejection and reuses room', async t => {
+  const { provision } = await import('./provision.mjs');
+  const {statSync} = await import('node:fs');
+  const dir = mkdtempSync(join(tmpdir(),'monsoon-owner-'));
+  t.after(() => rmSync(dir, { recursive:true, force:true }));
+  let registrations = 0, rooms = 0, quota = true;
+  const post = async (path, body) => {
+    if (path === '/agents/register') {
+      if (registrations === 1 && quota) throw Object.assign(new Error('quota'),{definitive:true});
+      registrations++;
+      return {agent:{id:'id-' + registrations},credentials:{api_key:'test-' + registrations}};
+    }
+    assert.equal(path,'/chats');
+    assert.equal(body.chat.participants.length,3);
+    rooms++;
+    return {id:'test-room'};
+  };
+  await assert.rejects(provision(dir, post), /quota/);
+  quota = false;
+  assert.equal(await provision(dir,post), 'test-room');
+  assert.equal(await provision(dir,post), 'test-room');
+  assert.equal(registrations,3);
+  assert.equal(rooms,1);
+  assert.equal(statSync(join(dir,'peers.env')).mode & 0o777,0o600);
+});

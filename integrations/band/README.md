@@ -42,3 +42,35 @@ Each run is scoped to the room and originating message. Reposting a command as a
 ## Verification
 
 The tests exercise the installed SDK’s GenericAdapter and FakeAgentTools, routing messages between independently instantiated peers and reopening their journals on each turn. They cover open and cut-off networks, reserve and van limits, concurrent scenarios, duplicate deliveries, forged senders, invalid inputs and a retry after a transport failure. The credentialed room walkthrough requires a Band account and three agent credentials.
+
+## Provision agents and a room with the Human API
+
+The owner can sign in at [Band](https://app.band.ai/), open the account menu → **Settings** → **REST API Keys** → **Create New API Key**, and select **Full access** for a temporary provisioning key. The register-only scope covers agent creation but cannot create a room. Store the key in the runtime's secret manager as BAND_USER_KEY or in a private file at ~/.config/monsoon-relay-band/owner.key with mode 0600. [Authentication and API keys](https://docs.band.ai/security/authentication) · [Human API](https://docs.band.ai/api/human-api)
+
+With the owner credential available, run the following from integrations/band:
+
+```sh
+node provision.mjs
+```
+
+The helper registers three owner-controlled external agents, saves each one-time credential before the next registration, then creates a dedicated room with all three participants. It prints the room ID and private environment-file path. The default state directory is ~/.config/monsoon-relay-band, outside the site checkout. Use one provisioning process per directory. Subsequent runs reuse that directory's recorded resources. After an ambiguous network failure the helper records which creation needs checking before a retry. If the account reaches its plan quota, the helper reports the API error and preserves completed registrations.
+
+To start each peer from integrations/band with the generated private environment, run the following in three terminals, substituting west and east for shelter in the other two:
+
+```sh
+node --env-file="$HOME/.config/monsoon-relay-band/peers.env" peer.mjs shelter
+```
+
+Open **Monsoon Relay · Dispatch Test** in Band and send the example scenario above. Owner access can be revoked in Settings once provisioning and any owner-driven tests are complete. The peers use their own agent keys.
+
+### One-command owner setup and verification
+
+From the repository root on Linux or macOS with Python 3 and Node 22.12 or later:
+
+```sh
+./integrations/band/run.py --test-room
+```
+
+The runner installs the locked SDK when needed, reads the temporary owner key from a hidden terminal prompt, BAND_USER_KEY, or the private owner.key file, provisions the peers and dedicated room, then starts all three peers. With --test-room it waits for all three agents to appear online, sends one road-30 scenario, and checks the room for a shelter reply matching the originating message ID and exact 12/20 outcome. A plan restriction on Human API sends can return HTTP 403. In that case run the same command without --test-room and submit the example using the shelter mention picker in the room. [Send messages](https://docs.band.ai/api/human-api/human-api-messages/send-my-chat-message) · [Read messages](https://docs.band.ai/api/human-api/human-api-messages/list-my-chat-messages)
+
+Keep the runner open to serve the room. Ctrl+C stops its local peers. Add --exit-after-test for a single verification run that stops those processes on completion. Room and agent registrations stay in your Band account. Run the orchestration fixtures from integrations/band with `python3 -m unittest test_runner`.
