@@ -19,14 +19,14 @@
       <div class="maplegend"><span><i class="key west"></i>West van</span><span><i class="key east"></i>East van</span><span><i class="key closed"></i>Closure</span></div>
       <a class="credit" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap contributors</a>
     </div>
-    <div class="field"><div class="sectionhead"><h2>Field report</h2><div class="field-actions"><span id="closed-count"></span><button id="mic" type="button">◉ &nbsp;Voice report</button></div></div>
+    <div class="field"><div class="sectionhead"><h2>Field report</h2><div class="field-actions"><span id="closed-count"></span><button id="radio-sample" type="button" title="Transcribe an English field recording on this device. First use downloads a 41 MB model.">▷ &nbsp;Demo radio</button><button id="mic" type="button">◉ &nbsp;Voice report</button></div></div>
       <label for="road">Select a road section or pick one on the map</label>
       <div class="reportrow"><select id="road"></select><button id="toggle">Close road</button></div>
-      <details id="voice-options"><summary>Report text and language</summary>
+      <details id="voice-options"><summary>Text, audio and language</summary>
         <label for="report-text">Report a road closure or reopening</label>
         <div class="reportrow"><input id="report-text" type="text" placeholder="Close Bhaskaran Road section two" autocomplete="off"><button id="parse-report" type="button">Review</button></div>
-        <div class="voicerow"><label for="language">Language</label><select id="language" aria-label="Report language"><option value="en-IN">English</option><option value="hi-IN">हिन्दी</option></select><label class="readback"><input type="checkbox" id="speak-result"> Speak dispatch result</label></div>
-      </details><p id="voice-msg" role="status"></p>
+        <div class="audio-row"><label for="audio-upload">Transcribe an English audio clip <span>· up to 25 s, 10 MB · first use downloads a 41 MB model</span></label><input id="audio-upload" type="file" accept="audio/*"></div><div class="voicerow"><label for="language">Language</label><select id="language" aria-label="Report language"><option value="en-IN">English</option><option value="hi-IN">हिन्दी</option></select><label class="readback"><input type="checkbox" id="speak-result"> Speak dispatch result</label></div>
+      </details><p id="radio-status" role="status"></p><p id="voice-msg" role="status"></p>
     </div>
   </section>
   <aside aria-label="Dispatch summary"><div class="request"><div class="location">Shelter request</div><h2>Drinking water</h2><p>Community hall <span>·</span> 20 crates within 15 min</p>
@@ -36,11 +36,11 @@
   </div>
   <div class="sideblock"><h2>Depot commitments</h2><div id="depots"></div>
   <div class="pledge"><label for="reserved">Reserved for school shelter pickup</label><output id="held" for="reserved">8 crates</output><input id="reserved" type="range" min="0" max="20" value="8"></div></div>
-  <div class="sideblock exchange"><div class="sectionhead"><h2>Dispatch exchange</h2><button id="evidence" class="textbutton">Run receipt</button></div><ol id="messages"></ol></div>
+  <div class="sideblock exchange"><div class="sectionhead"><h2>Dispatch exchange</h2><div class="exchange-actions"><button id="replay" type="button" class="textbutton">Replay</button><button id="evidence" class="textbutton">Run receipt</button></div></div><ol id="messages"></ol></div>
   </aside>
 </main>
 <footer><span>Halasuru, Bengaluru · Simulated teams, stock and travel times.</span></footer>
 <p id="session-status" role="status"></p>
 <dialog id="receipt-dialog" aria-labelledby="receipt-title"><div class="sectionhead"><h2 id="receipt-title">Run receipt</h2><button id="receipt-close" type="button" aria-label="Close run receipt">×</button></div><pre id="receipt-body"></pre><div class="receipt-actions"><button id="copy-receipt">Copy receipt</button><button id="band-command">Copy BAND command</button></div></dialog>
-<script src="streets.js"></script><script src="dispatch.js"></script><script src="map.js"></script><script src="voice.js"></script><script src="protocol.js"></script><script src="runtime.js"></script><script src="app.js"></script>
+<script src="streets.js"></script><script src="dispatch.js"></script><script src="map.js"></script><script src="radio.js"></script><script src="voice.js"></script><script src="protocol.js"></script><script src="runtime.js"></script><script src="app.js"></script>
 </body></html>

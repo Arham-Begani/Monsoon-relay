@@ -3,7 +3,7 @@ const featured = 30;
 const runtime = createRelayRuntime();
 const roadSelect = get('road'), reserved = get('reserved');
 const closed = new Set();
-let selected = featured, requestVersion = 0, plan = null, receipt = null, reports = null, toastTimer;
+let selected = featured, requestVersion = 0, plan = null, receipt = null, reports = null, radio = null, toastTimer, replayTimer;
 const roadsByLabel = streets.roads.map((road,id) => ({id,label:road.label}))
   .sort((a,b) => a.label.localeCompare(b.label,'en',{numeric:true}));
 const westPath = findRoute(scenario.west,new Set()).path;
@@ -44,7 +44,7 @@ function selectRoad(id) {
   get('toggle').classList.toggle('reopen',isClosed);
   if (plan) paint({plan,closed,selected});
 }
-function manualSelect(id) { reports?.reset(); selectRoad(id); }
+function manualSelect(id) { radio?.reset(); reports?.reset(); selectRoad(id); }
 const paint = createMap(get('map'),manualSelect);
 function makeReceipt(result,held) {
   const eta = value => Number.isFinite(value) ? value : null;
@@ -100,7 +100,30 @@ function speakResult() {
   const utterance=new SpeechSynthesisUtterance(text);utterance.lang=get('language').value;
   speechSynthesis.cancel();speechSynthesis.speak(utterance);
 }
+function stopReplay() {
+  clearTimeout(replayTimer);replayTimer=null;
+  get('messages').querySelectorAll('.current').forEach(node=>node.classList.remove('current'));
+  get('replay').textContent='Replay';
+}
+get('replay').addEventListener('click',()=>{
+  if(replayTimer){stopReplay();return;}
+  if(!plan)return;
+  let step=0;
+  get('replay').textContent='Stop';
+  function advance(){
+    const lines=[...get('messages').children];
+    lines.forEach((line,i)=>line.classList.toggle('current',i===step));
+    if(step>=lines.length){stopReplay();return;}
+    const current=lines[step++];
+    const list=get('messages');
+    list.scrollTop+=Math.max(0,current.getBoundingClientRect().bottom-list.getBoundingClientRect().bottom);
+    replayTimer=setTimeout(advance,1000);
+  }
+  get('messages').scrollTop=0;
+  advance();
+});
 async function update(readBack=false) {
+  stopReplay();
   const version=++requestVersion;
   const held=Number(reserved.value);
   get('held').textContent=held+' crates';
@@ -123,14 +146,14 @@ function setClosure(id,isClosed) {
 }
 roadSelect.addEventListener('change',()=>manualSelect(Number(roadSelect.value)));
 get('toggle').addEventListener('click',()=>{
-  reports.reset();
+  radio?.reset();reports.reset();
   const isClosed=!closed.has(selected);
   setClosure(selected,isClosed);
   get('voice-msg').textContent=streets.roads[selected].label+(isClosed?' closed.':' reopened.');
 });
 reserved.addEventListener('input',()=>update());
 function loadScenario(input) {
-  reports?.reset();closed.clear();
+  radio?.reset();reports?.reset();closed.clear();
   for(const road of input.roads)closed.add(road);
   reserved.value=input.reserve;selected=input.pick;roadSelect.value=String(selected);
   update();
@@ -149,7 +172,14 @@ reports=installFieldReports({
   roads:streets.roads,getSelected:()=>selected,isClosed:id=>closed.has(id),
   selectRoad,applyReport:setClosure,announce:text=>{get('voice-msg').textContent=text;}
 });
-get('mic').addEventListener('click',()=>{get('voice-options').open=true;});
+radio=installRadioIntake({onTranscript:text=>{
+  get('voice-options').open=true;
+  get('report-text').value=text;
+  get('parse-report').click();
+},announce:text=>{get('radio-status').textContent=text;}});
+get('radio-sample').addEventListener('click',()=>reports.reset());
+get('mic').addEventListener('click',()=>{radio.reset();get('voice-options').open=true;});
+get('report-text').addEventListener('input',()=>radio.reset());
 function showReceipt(){get('receipt-body').textContent=JSON.stringify(receipt,null,2);}
 get('evidence').addEventListener('click',()=>{if(receipt){showReceipt();get('receipt-dialog').showModal();}});
 get('receipt-close').addEventListener('click',()=>get('receipt-dialog').close());
