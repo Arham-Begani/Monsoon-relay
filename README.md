@@ -24,6 +24,8 @@ npm start
 
 Open http://localhost:8000. The server publishes only the files copied into `dist/`. A static deployment uses `npm run build` and publishes that same directory.
 
+For a venue rehearsal with unreliable Wi-Fi, run `python3 scripts/prepare_speech.py` while online, then `python3 -m http.server 8000 --directory dist`. That build serves the English audio model locally. On the public site, **Prepare audio for this tab** warms up recognition ahead of a demo.
+
 ## How a pledge is made
 
 * **Intake.** The live microphone uses browser speech recognition. The sample and short English audio uploads use an integrity-pinned Vosk model running in WebAssembly on the device. A map-aware parser checks status and section identity. Closures and reopenings require confirmation.
@@ -31,6 +33,10 @@ Open http://localhost:8000. The server publishes only the files copied into `dis
 * **Negotiation.** West, East and the shelter run in separate browser Web Workers. A depot can reject a request or offer stock subject to availability, van capacity and the deadline. The shelter counts a pledge after an acceptance and a depot commitment. Run IDs separate simultaneous simulations. Repeated messages reuse the existing decision. The receipt identifies the actual transport, including the in-process fallback.
 * **Counterfactuals.** A background worker evaluates one additional closure per open section. It ranks the results by supply loss, transfer of work from West and route delay. The west-only comparison uses exactly the same closures and stock as the coordinated run.
 * **BAND.** A separate deployment runs three authenticated Node processes using the official `@band-ai/sdk`. Per-room journals persist their decisions across retries. Copy a scenario command from the receipt to reproduce it in a configured BAND room. The public browser demo works without sponsor credentials. [BAND setup and verification](integrations/band/README.md)
+
+## Run the hosted BAND test
+
+Once an owner key is supplied privately, `./integrations/band/run.py --test-room` provisions the three agents and a dedicated room, sends the featured scenario, and checks the signed-in shelter’s correlated 12/20 response. The runner prompts for the key privately when it is absent from the environment. [Owner setup](integrations/band/README.md)
 
 ## Verification
 

@@ -27,7 +27,7 @@
       <details id="voice-options"><summary>Text, audio and language</summary>
         <label for="report-text">Report a road closure or reopening</label>
         <div class="reportrow"><input id="report-text" type="text" placeholder="Close Bhaskaran Road section two" autocomplete="off"><button id="parse-report" type="button">Review</button></div>
-        <div class="audio-row"><label for="audio-upload">Transcribe an English audio clip <span>· up to 25 s, 10 MB · first use downloads a 41 MB model</span></label><input id="audio-upload" type="file" accept="audio/*"></div><div class="voicerow"><label for="language">Language</label><select id="language" aria-label="Report language"><option value="en-IN">English</option><option value="hi-IN">हिन्दी</option></select><label class="readback"><input type="checkbox" id="speak-result"> Speak dispatch result</label></div>
+        <div class="audio-row"><button id="radio-prepare" type="button">Prepare audio for this tab</button><label for="audio-upload">Transcribe an English audio clip <span>· up to 25 s, 10 MB · first use downloads a 41 MB model</span></label><input id="audio-upload" type="file" accept="audio/*"></div><div class="voicerow"><label for="language">Language</label><select id="language" aria-label="Report language"><option value="en-IN">English</option><option value="hi-IN">हिन्दी</option></select><label class="readback"><input type="checkbox" id="speak-result"> Speak dispatch result</label></div>
       </details><p id="radio-status" role="status"></p><p id="voice-msg" role="status"></p>
     </div>
   </section>

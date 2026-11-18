@@ -1,12 +1,19 @@
 (() => {
-  const libraryUrl = 'https://cdn.jsdelivr.net/npm/vosk-browser@0.0.8/dist/vosk.js';
+  const rehearsalAssets = document.currentScript?.getAttribute('data-rehearsal-assets');
+  const libraryUrl = rehearsalAssets
+    ? rehearsalAssets + 'vosk.js'
+    : 'https://cdn.jsdelivr.net/npm/vosk-browser@0.0.8/dist/vosk.js';
   const libraryIntegrity = 'sha384-nqyY8clHf93uBYFkgkACShMTuvE3U57yXSJaf0Ws+XgzcoUe6OB/1BiOfHqKOWeg';
-  const modelUrl = 'https://ccoreilly.github.io/vosk-browser/models/vosk-model-small-en-us-0.15.tar.gz';
+  const modelFile = 'vosk-model-small-en-us-0.15.tar.gz';
+  const modelUrl = rehearsalAssets
+    ? rehearsalAssets + modelFile
+    : 'https://ccoreilly.github.io/vosk-browser/models/' + modelFile;
   const modelIntegrity = 'sha384-eq22GjcvmxRBpqH/h4DNPIG+8QhLmcxbrpYcPpRLMTgr18q5NAErUYZR5HxRFSnP';
   const sampleRate = 16000;
   const maxSeconds = 25;
   const maxBytes = 10 * 1024 * 1024;
   let modelRequest;
+  let modelReady = false;
 
   function deadline(promise, millis) {
     let timer;
@@ -45,6 +52,7 @@
           });
           model.on('error', () => reject(new Error('Recognizer could not open the model')));
         }), 30000);
+        modelReady = true;
         return model;
       } catch (error) {
         model.terminate();
@@ -105,16 +113,24 @@
   }) {
     const sample = document.getElementById('radio-sample');
     const upload = document.getElementById('audio-upload');
+    const prepare = document.getElementById('radio-prepare');
     const status = document.getElementById('radio-status');
     const tell = announce || (text => { status.textContent = text; });
     let player;
     let attempt = 0;
     let busy = false;
+    const loading = rehearsalAssets
+      ? 'Loading the local English speech model…'
+      : 'Preparing English recognition · first run downloads about 41 MB.';
+    const unavailable = rehearsalAssets
+      ? 'Could not load the local English speech model. Serve the prepared rehearsal build on localhost or type the report.'
+      : 'Could not load the English speech model. Retry with a network connection or type the report.';
 
     function setBusy(value) {
       busy = value;
       sample.disabled = value;
       if (upload) upload.disabled = value;
+      if (prepare) prepare.disabled = value;
     }
 
     async function review(read) {
@@ -128,7 +144,7 @@
         const samples = await readMono(await read());
         if (current !== attempt) return;
         phase = 'model';
-        tell('Preparing English recognition · first run downloads about 41 MB.');
+        if (!modelReady) tell(loading);
         const model = await getModel();
         if (current !== attempt) return;
         phase = 'transcription';
@@ -143,7 +159,7 @@
         onTranscript(text);
       } catch (error) {
         if (current !== attempt) return;
-        if (phase === 'model') tell('Could not load the English speech model. Retry with a network connection or type the report.');
+        if (phase === 'model') tell(unavailable);
         else if (phase === 'transcription') tell('Could not transcribe the clip. Try a short English recording or type the report.');
         else if (error.message.startsWith('Choose an English audio clip')) tell(error.message);
         else tell('Could not read the audio. Try a WAV or MP3 file, or type the report.');
@@ -151,6 +167,21 @@
         if (current === attempt) setBusy(false);
       }
     }
+
+    prepare?.addEventListener('click', async () => {
+      if (busy) return;
+      const current = ++attempt;
+      setBusy(true);
+      if (!modelReady) tell(loading);
+      try {
+        await getModel();
+        if (current === attempt) tell('English audio recognition is ready in this tab.');
+      } catch {
+        if (current === attempt) tell(unavailable);
+      } finally {
+        if (current === attempt) setBusy(false);
+      }
+    });
 
     sample.addEventListener('click', () => {
       if (busy) return;
