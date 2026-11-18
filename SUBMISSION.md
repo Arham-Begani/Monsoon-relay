@@ -7,26 +7,41 @@
 
 ## Project description
 
-A flood-relief volunteer reports that a road has closed. Monsoon Relay identifies the relevant street section, shows the proposed change to the operator for confirmation, and negotiates a revised drinking-water delivery. A shelter and two independently executing depot agents check availability, stock, van capacity and deadlines on a real Bengaluru street graph. The shelter can account for every committed crate and explain any shortfall. Judges can submit a voice report, change a stock reservation, introduce multiple closures or run every possible next closure as an experiment.
+A community hall in Bengaluru needs 20 crates of drinking water in 15 minutes. The west depot can get there in 12. Then a volunteer radios in that a section of Bhaskaran Road has flooded. Which depot can still reach the hall, and how much water can it promise without taking supplies already pledged to a school?
+
+Monsoon Relay is a voice-driven flood-relief dispatch simulator built around that decision. An operator hears the report, sees which street section it refers to, and confirms the closure. Three independent agents then negotiate a new plan. Each depot checks its route, available stock, van capacity and the shelter’s deadline. The shelter counts a crate only after it accepts an offer and the depot confirms its commitment.
+
+In the featured scenario, the closure pushes West’s journey to 21 minutes. East can arrive in eight minutes. It has 20 crates, but eight are reserved for a school shelter. East commits the remaining 12. The hall can now ask another supplier for the eight crates it still needs. The map uses 970 real OpenStreetMap nodes in Halasuru. Stock and travel times are simulated. Judges can change the school’s reservation, inspect each agent’s messages, or test all 294 road sections to discover which closures actually force a handoff.
 
 ## What to demonstrate
 
 Close the featured section of Bhaskaran Road. West’s 12-minute drive becomes a 21-minute trip and misses the 15-minute deadline. East has 20 crates, eight committed to a school shelter and a van with capacity for 16. Its agent offers 12 crates on an eight-minute route, the community hall accepts, and East commits. West alone could pledge zero crates on time. These are simulation results. Change the school reservation to 18 and the coordinated offer falls to two.
 
-## Sponsor use and evidence
+## How did you use BAND?
 
-| Platform | Project use and verification |
-|---|---|
-| BAND | Three independently authenticated agents completed a real BAND room negotiation using the TypeScript SDK and its HTTPS transport. The eight-message exchange took 8.46 seconds and confirmed 12 crates on time with eight outstanding. The browser demo runs its own local workers. [Verified BAND messages](docs/band-live-run.md) |
-| AdaL | The authenticated AdaL CLI used its Bash tool and a local Ollama model to run the FFmpeg edit. The 90.65-second 1080p export combines footage from the working app with the verified BAND result and narration. [Render receipt and video](docs/adal/README.md) |
-| Finch, Lyzr, Agent37 | No integration claimed. |
+We gave the shelter, West depot and East depot separate BAND identities and ran each as its own Node.js process. Using the official BAND SDK over HTTPS, they exchanged requests, offers, an acceptance and a final commitment in a shared room. The recorded exchange took 8.46 seconds from the operator’s message to the shelter’s final tally of 12 crates pledged and eight outstanding. Judges can inspect all eight timestamped messages. The public simulator uses three browser workers so anyone can try the same negotiation without credentials. [BAND room receipt](docs/band-live-run.md)
 
-## Engineering challenges
+## How did you use AdaL?
 
-- A reported road name can refer to several map sections. The field agent requests an exact section or an explicit reference to the selected road. Ambiguity, negation and uncertain reports leave the plan intact.
-- A fast-moving operator can change stock while the workers are still negotiating. Each simulation has a unique run ID, and the UI accepts only the latest revision. A depot commitment is idempotent within a run.
-- A visually plausible detour can still arrive too late. Every offer is checked against the same directed road graph and deadline. Judges can compare coordinated dispatch with West operating alone and audit the individual messages.
-- Microphone services vary by browser. An English sample and short audio uploads use an on-device acoustic model. Typed Hindi, Hinglish and English reports also pass through the same confirmation step.
+We used the authenticated AdaL CLI to produce the final 90.65-second walkthrough. Working with a local Ollama model, AdaL invoked FFmpeg through its Bash tool to combine the captioned screen recording, radio audio and narration with a closing card showing the verified BAND result. Judges can watch the road report change the plan, then check the actual agent exchange behind the closing numbers. [Watch the walkthrough](https://monsoon-relay.vercel.app/watch.html) · [AdaL render receipt](docs/adal/render-receipt.json)
+
+## How did you use Finch?
+
+Finch was not used in Monsoon Relay.
+
+## How did you use Lyzr?
+
+Lyzr was not used in Monsoon Relay.
+
+## How did you use Agent37?
+
+Agent37 was not used in Monsoon Relay.
+
+## What problems did you face during building?
+
+“Bhaskaran Road is flooded” sounds precise over the radio, but the map contains several sections with that name. Closing the wrong section can change which depot wins the request. We added section matching and operator confirmation. An ambiguous report leaves the current route in place. Browser microphone support also varied, so we added on-device English transcription for recorded and uploaded audio, alongside typed English, Hindi and Hinglish reports.
+
+We also had to handle a depot replying after the operator had already changed a reservation. We gave every run a unique ID, ignored replies from earlier runs, and made repeated confirmations count only once. We then checked the routing and pledge logic across every single-road closure and compared 292 combinations of disruptions against independent agent negotiations.
 
 ## Submission details
 
